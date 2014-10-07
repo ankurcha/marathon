@@ -98,22 +98,26 @@ trait StorageProvider {
 object StorageProvider {
   val HDFS = "^(hdfs://[^/]+)(.*)$".r // hdfs://host:port/path
   val FILE = "^file://(.*)$".r // file:///local/artifact/path
+  val S3   = "^s3://(.+):(.+)@([^/]+)(.*)$".r
 
   def provider(config: MarathonConf, http: HttpConf): StorageProvider = config.artifactStore.get.getOrElse("") match {
     case HDFS(uri, base) => new HDFSStorageProvider(new URI(uri), if (base.isEmpty) "/" else base, new Configuration())
     case FILE(base)      => new FileStorageProvider(s"http://${config.hostname.get.get}:${http.httpPort.get.get}/v2/artifacts", new File(base))
+    case S3(access_key, secret_key, bucket, prefix) => new S3StorageProvider(access_key, secret_key, bucket, if (prefix.isEmpty) "/" else prefix)
     case _               => new NoStorageProvider()
   }
 
   def isValidUrl(url: String): Boolean = url match {
-    case HDFS(_, _) => true
-    case FILE(_)    => true
-    case _          => false
+    case HDFS(_, _)  => true
+    case FILE(_)     => true
+    case S3(_,_,_,_) => true
+    case _           => false
   }
 
   def examples: Map[String, String] = Map (
     "hdfs" -> "hdfs://localhost:54310/path/to/store",
     "file" -> "file:///var/log/store"
+    "s3"   -> "s3://access-key:secret-key@bucket_name/prefix/path"
   )
 }
 

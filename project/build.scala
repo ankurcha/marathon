@@ -137,6 +137,7 @@ object Dependencies {
     hadoopCommon % "compile",
     beanUtils % "compile",
     scallop % "compile",
+    awscala % "compile",
 
     // test
     Test.scalatest % "test",
@@ -167,6 +168,7 @@ object Dependency {
     // test deps versions
     val Mockito = "1.9.5"
     val ScalaTest = "2.1.7"
+    val awscala = "0.3.+"
   }
 
   val excludeMortbayJetty = ExclusionRule(organization = "org.mortbay.jetty")
@@ -192,6 +194,7 @@ object Dependency {
   val hadoopCommon = "org.apache.hadoop" % "hadoop-common" % V.Hadoop excludeAll(excludeMortbayJetty, excludeJavaxServlet)
   val beanUtils = "commons-beanutils" % "commons-beanutils" % "1.9.2"
   val scallop = "org.rogach" %% "scallop" % V.Scallop
+  val awscala = "com.github.seratch" %% "awscala" % V.awscala
 
   object Test {
     val scalatest = "org.scalatest" %% "scalatest" % V.ScalaTest
