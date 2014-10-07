@@ -1,13 +1,12 @@
 package mesosphere.marathon.io.storage
 
-import java.io.{ File, FileInputStream, InputStream, OutputStream }
+import java.io.{File, FileInputStream, InputStream, OutputStream}
 import java.net.URI
-
-import org.apache.hadoop.conf.Configuration
 
 import mesosphere.chaos.http.HttpConf
 import mesosphere.marathon.MarathonConf
 import mesosphere.marathon.io.IO
+import org.apache.hadoop.conf.Configuration
 
 /**
   * The storage item is an entry in the storage, which is identified by a path.
@@ -102,9 +101,9 @@ object StorageProvider {
 
   def provider(config: MarathonConf, http: HttpConf): StorageProvider = config.artifactStore.get.getOrElse("") match {
     case HDFS(uri, base) => new HDFSStorageProvider(new URI(uri), if (base.isEmpty) "/" else base, new Configuration())
-    case FILE(base)      => new FileStorageProvider(s"http://${config.hostname.get.get}:${http.httpPort.get.get}/v2/artifacts", new File(base))
-    case S3(access_key, secret_key, bucket, prefix) => new S3StorageProvider(access_key, secret_key, bucket, if (prefix.isEmpty) "/" else prefix)
-    case _               => new NoStorageProvider()
+    case FILE(base) => new FileStorageProvider(s"http://${config.hostname.get.get}:${http.httpPort.get.get}/v2/artifacts", new File(base))
+    case S3(access_key, secret_key, bucket, prefix) => new S3StorageProvider(awscala.s3.S3(access_key, secret_key), bucket, if (prefix.isEmpty) "/" else prefix)
+    case _ => new NoStorageProvider()
   }
 
   def isValidUrl(url: String): Boolean = url match {
@@ -116,7 +115,7 @@ object StorageProvider {
 
   def examples: Map[String, String] = Map (
     "hdfs" -> "hdfs://localhost:54310/path/to/store",
-    "file" -> "file:///var/log/store"
+    "file" -> "file:///var/log/store",
     "s3"   -> "s3://access-key:secret-key@bucket_name/prefix/path"
   )
 }

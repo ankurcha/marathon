@@ -92,8 +92,7 @@ case class S3StorageItem(s3: S3, bucket: Bucket, key: String) extends StorageIte
   override def path: String = s"s3://${bucket.name}$key"
 }
 
-class S3StorageProvider(access_key: String, secret_key: String, bucketName: String, prefix: String) extends StorageProvider {
-  implicit val s3 = S3(access_key, secret_key)
+class S3StorageProvider(s3: S3, bucketName: String, prefix: String) extends StorageProvider {
   val bucket: Bucket = s3.createBucket(bucketName)
   val base: String = prefix
 
